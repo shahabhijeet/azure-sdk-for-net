@@ -3,12 +3,14 @@
 // license information.
 
 using System;
+using System.Collections.Specialized;
+using System.Configuration;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Configuration;
+//using System.Runtime.
 
 [assembly: CLSCompliant(true)]
 namespace Microsoft.Azure
@@ -45,7 +47,11 @@ namespace Microsoft.Azure
                 _roleEnvironmentExceptionType = assembly.GetType(RoleEnvironmentExceptionTypeName, false);
                 if (roleEnvironmentType != null)
                 {
+#if FullNetFx
                     PropertyInfo isAvailableProperty = roleEnvironmentType.GetProperty(IsAvailablePropertyName);
+#else
+                    PropertyInfo isAvailableProperty = roleEnvironmentType.GetTypeInfo().GetProperty(IsAvailablePropertyName);
+#endif
                     bool isAvailable;
 
                     try
@@ -55,7 +61,9 @@ namespace Microsoft.Azure
 
                         if (isAvailable)
                         {
+#if FullNetFx
                             WriteTraceLine(message);
+#endif
                         }
                     }
                     catch (TargetInvocationException e)
@@ -73,8 +81,14 @@ namespace Microsoft.Azure
 
                     if (isAvailable)
                     {
+#if FullNetFx
                         _getServiceSettingMethod = roleEnvironmentType.GetMethod(GetSettingValueMethodName,
                             BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod);
+#else
+                        _getServiceSettingMethod = roleEnvironmentType.GetTypeInfo().GetMethod(GetSettingValueMethodName,
+                            BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod);
+#endif
+
                     }
                 }
             }
@@ -94,8 +108,14 @@ namespace Microsoft.Azure
             }
             Type type = e.GetType();
 
+#if FullNetFx
             return object.ReferenceEquals(type, _roleEnvironmentExceptionType)
                 || type.IsSubclassOf(_roleEnvironmentExceptionType);
+#else
+            return object.ReferenceEquals(type, _roleEnvironmentExceptionType) 
+                || type.GetTypeInfo().IsSubclassOf(_roleEnvironmentExceptionType);
+#endif
+
         }
 
         /// <summary>
@@ -118,10 +138,19 @@ namespace Microsoft.Azure
                 if (throwIfNotFoundInRuntime)
                 {
                     var errorMessage = string.Format(CultureInfo.InvariantCulture, Resources.ErrorSettingNotFoundInRuntimeString, name);
+
                     throw new SettingsPropertyNotFoundException(errorMessage);
                 }
 
+#if FullNetFx
                 value = GetValue("ConfigurationManager", name, n => ConfigurationManager.AppSettings[n], outputResultsToTrace);
+#else
+                //GetValue("", name, (n) => ConfigurationManager.)
+                //string foo = ConfigurationManager.AppSettings
+                //value = GetValue("ConfigurationManager", name, n => ConfigurationManager.AppSettings
+#endif
+
+
             }
 
             return value;
@@ -142,7 +171,16 @@ namespace Microsoft.Azure
             value = GetValue("ServiceRuntime", name, GetServiceRuntimeSetting, outputResultsToTrace);
             if (value == null)
             {
+#if FullNetFx
                 value = GetValue("ConfigurationManager", name, n => ConfigurationManager.AppSettings[n], outputResultsToTrace);
+#else
+                NameValueCollection nvc = ConfigurationManager.AppSettings;
+                value = GetValue("ConfigurationManager", name, n => ConfigurationManager.AppSettings[n], outputResultsToTrace);
+#endif
+
+
+
+
             }
 
             return value;
@@ -197,7 +235,10 @@ namespace Microsoft.Azure
 
                 try
                 {
+#if FullNetFx
                     WriteTraceLine(message);
+#endif
+
                 }
                 catch (Exception)
                 {
@@ -255,7 +296,12 @@ namespace Microsoft.Azure
                 {
                     if (!string.IsNullOrEmpty(assemblyPath))
                     {
+#if FullNetFx
                         assembly = Assembly.LoadFrom(assemblyPath);
+#else
+                        AssemblyName asmName = new AssemblyName(assemblyName);
+                        assembly = Assembly.Load(asmName);
+#endif
                     }
                 }
                 catch (Exception e)
@@ -274,6 +320,7 @@ namespace Microsoft.Azure
             return assembly;
         }
 
+#if FullNetFx
         /// <summary>
         /// Writes to trace output if WriteToTrace is true
         /// </summary>
@@ -282,5 +329,6 @@ namespace Microsoft.Azure
         {
             Trace.WriteLine(message);
         }
+#endif
     }
 }

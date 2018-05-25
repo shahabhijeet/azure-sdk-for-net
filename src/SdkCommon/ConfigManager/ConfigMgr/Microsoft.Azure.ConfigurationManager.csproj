@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$([MSBuild]::GetPathOfFileAbove('AzSdk.props'))" />
+  <!--<Import Project="$([MSBuild]::GetPathOfFileAbove('AzSdk.props'))" />-->
   <PropertyGroup>
     <Description>Microsoft Azure Configuration Manager provides a unified API to load configuration settings regardless of where the application is hosted - whether on-premises or in a Cloud Service.</Description>
     <AssemblyName>Microsoft.Azure.ConfigurationManager</AssemblyName>
@@ -18,7 +18,7 @@
     </PackageReleaseNotes>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFrameworks>net452</TargetFrameworks>
+    <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
     <!--;netstandard1.4-->
   </PropertyGroup>
 
@@ -37,7 +37,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.0.4" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System.Net" />
@@ -47,4 +49,11 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.configuration" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.0" />
+    <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
+
 </Project>

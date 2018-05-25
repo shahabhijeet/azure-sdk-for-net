@@ -2,8 +2,15 @@
 // Licensed under the MIT License. See License.txt in the project root for
 // license information.
 
+using Microsoft.Extensions.DependencyModel;
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
+#if !FullNetFx
+using System.Runtime.Loader;
+#endif
+
 
 namespace Microsoft.Azure
 {
@@ -66,5 +73,29 @@ namespace Microsoft.Azure
 
             return aInfo.currentAssemblyPath;
         }
+#if !FullNetFx
+        public static Assembly LoadFromAssemblyContext(string assemblyName)
+        {
+            if (string.IsNullOrEmpty(assemblyName)) throw new NullReferenceException(string.Format(Resources.ErrorArgumentEmptyString, "assemblyName"));
+
+            AssemblyLoader asmLoad = new AssemblyLoader();
+            AssemblyName asmName = new AssemblyName(assemblyName);
+            Assembly assembly = asmLoad.LoadFromAssemblyName(asmName);
+            return assembly;
+        }
+#endif
     }
+
+#if !FullNetFx
+    public class AssemblyLoader : AssemblyLoadContext
+    {
+        protected override Assembly Load(AssemblyName assemblyName)
+        {
+            var deps = DependencyContext.Default;
+            var res = deps.CompileLibraries.Where(d => d.Name.Contains(assemblyName.Name)).ToList();
+            var assembly = Assembly.Load(new AssemblyName(res.First().Name));
+            return assembly;
+        }
+    }
+#endif
 }
