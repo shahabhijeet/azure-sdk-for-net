@@ -37,8 +37,8 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <SignAssembly>$(CodeSign)</SignAssembly>
-    <DelaySign>$(CodeSign)</DelaySign>
+    <SignAssembly>$(DelaySign)</SignAssembly>
+    <DelaySign>$(DelaySign)</DelaySign>
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(LibraryFxTarget)' == 'net45'" >
@@ -97,9 +97,10 @@
   </PropertyGroup>
 
   <Target Name="InformationAboutThisBuild" BeforeTargets="BeforeBuild">
-    <Error Text="The current build type has not been defined." Condition=" '$(LibraryFxTarget)' == '' " />
-    <Message Text="Current build type:            $(LibraryFxTarget)" />
-    <Message Text="TargetFrameworkVersion: $(TargetFrameworkVersion) TargetFrameworkProfile: $(TargetFrameworkProfile)" />
+    <Error Text="The current build type has not been defined." Condition=" '$(LibraryFxTarget)' == '' " Importance="High" />
+    <Message Text="Current build type:            $(LibraryFxTarget)" Importance="High" />
+    <Message Text="TargetFrameworkVersion: $(TargetFrameworkVersion) TargetFrameworkProfile: $(TargetFrameworkProfile)" Importance="High" />
+    <Message Text="LibraryCustomConstants: $(LibraryCustomConstants)" Importance="High" />
   </Target>
 
   <Target Name="CopySdkBinaries" AfterTargets="AfterBuild">

@@ -38,7 +38,8 @@
           DependsOnTargets="EnsureBinariesFolderExists">
     <!-- First we copy nuspec files to binaries folder -->
     <ItemGroup>
-      <NuspecFilesToUpdate Include="%(SdkNuGetPackage.Folder)%(SdkNuGetPackage.Identity).nuspec" />
+      <NuspecFilesToUpdate Condition=" '$(NuspecRelativeFilePath)' != '' " Include="$(LibraryRoot)$(NuspecRelativeFilePath)" />
+      <NuspecFilesToUpdate Condition=" '@(NuspecFilesToUpdate)' == '' " Include="%(SdkNuGetPackage.Folder)%(SdkNuGetPackage.Identity).nuspec" />
     </ItemGroup>
 	
     <PropertyGroup>
@@ -48,6 +49,9 @@
 	
     <Error Text="NuGet specification %(NuspecFilesToUpdate.Identity) not found."
            Condition="!Exists(%(NuspecFilesToUpdate.Identity))" />
+
+    <Message Text="NuspecFilesToUpdate...... @(NuspecFilesToUpdate)" />
+    <Message Text="NuSpecReplacementTokens Info...... %(NuSpecReplacementTokens.Value)" />
 
     <!-- First replace any string tokens, storing the output in the binaries 
          folder instead of doing a destructive replacement. -->

@@ -24,6 +24,7 @@ Supported Portable Library Platforms:
 - Portable Class Libraries</description>
     <copyright>Copyright © Microsoft Corporation</copyright>
     <tags>Microsoft "Microsoft Azure" Azure cloud REST HTTP client core common azureofficial windowsazureofficial</tags>
+    <releaseNotes>Republishing and SHA256 signed</releaseNotes>
     <references>
       <group targetFramework="portable-net45+wp8+wpa81+win">
         <reference file="Microsoft.Azure.Common.dll" />

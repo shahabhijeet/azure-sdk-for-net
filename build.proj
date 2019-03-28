@@ -71,6 +71,7 @@
     <FxTargetList Condition=" '$(FxTargetList)' == '' and ('$(Scope)' == '' or '$(Scope)' == 'all' or '$(Scope)' == 'Common') ">portable;net40;net45</FxTargetList>
     <!--If FxTargetList still has no value, it must be an individual maml package-->
     <FxTargetList Condition=" '$(FxTargetList)' == '' ">portable;net40</FxTargetList>
+    <DelaySignBinaries Condition=" '$(DelaySignBinaries)' == '' ">true</DelaySignBinaries>
   </PropertyGroup>
 
   <ItemGroup>
@@ -185,7 +186,7 @@
         DestinationPath="binaries\$(LibraryFxTarget)"
         SigningLogPath="binaries\$(LibraryFxTarget)\signing.log"
         ToolsPath="$(CIToolsPath)"
-        Condition="!$(DelaySign)"/>
+        Condition="!$(DelaySign)" />
     <!--If we are testing locally then we copy the binaries and do not submit to the code sign server-->
     <Copy SourceFiles="@(DelaySignedAssembliesToValidate)" DestinationFolder="binaries\$(LibraryFxTarget)" Condition="$(DelaySign)" />
     
@@ -229,6 +230,9 @@
   </Target>
 
   <Target Name="RestoreNugetPackages">
+    <PropertyGroup>
+      <NugetRestoreConfigSwitch>-ConfigFile NuGet.Config</NugetRestoreConfigSwitch>
+    </PropertyGroup>
     <!--TODO: respect the 'scope', and do not always restore all of them-->
     <Exec Command="$(NuGetCommand) restore $(CommonSolution) $(NuGetRestoreConfigSwitch)"/>
     <Exec Command="$(NuGetCommand) restore $(AuthenticationSolution) $(NuGetRestoreConfigSwitch)"/>
