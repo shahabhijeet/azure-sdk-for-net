@@ -37,8 +37,8 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <SignAssembly>$(CodeSign)</SignAssembly>
-    <DelaySign>$(CodeSign)</DelaySign>
+    <SignAssembly>$(DelaySign)</SignAssembly>
+    <DelaySign>$(DelaySign)</DelaySign>
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(LibraryFxTarget)' == 'net45'" >
